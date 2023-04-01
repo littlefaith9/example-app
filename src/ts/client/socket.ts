@@ -1,4 +1,4 @@
-import { decodeId, decodeMovement, decodePosition, encodeId, encodeMovement, encodePosition } from "../common/encoding";
+import { decodeId, decodeMovement, decodePosition, encodeId, encodeVelocity, encodePosition } from "../common/encoding";
 import { createFromJoin } from "../common/entityUtils";
 import { Action } from "../common/interfaces";
 import { Game } from "./game";
@@ -69,8 +69,8 @@ export class ServerAction {
 		this.ws.send(new Uint8Array([Action.Join, ...encodeId(this.id), ...encodePosition(x, y, r)]));
 	}
 	sendMove() {
-		const { x, y, vx, vy, right } = this.game.player;
-		this.ws.send(new Uint8Array([Action.Move, ...encodeMovement(this.id, x, y, right, vx, vy)]));
+		const { vx, vy } = this.game.player;
+		this.ws.send(new Uint8Array([Action.Move, encodeVelocity(vx, vy)]));
 	}
 }
 

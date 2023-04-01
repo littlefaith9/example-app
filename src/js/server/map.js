@@ -1,13 +1,14 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ServerMap = void 0;
+const encoding_1 = require("../common/encoding");
 const entityUtils_1 = require("../common/entityUtils");
 class ServerMap {
     constructor() {
         this.clients = [];
         this.lastCountUpdate = 0;
         this.lastMovementUpdate = 0;
-        this.movementUpdated = new Map();
+        this.movementUpdated = new Set();
         this.nameMapping = new Map();
         this.update(Date.now());
     }
@@ -38,6 +39,22 @@ class ServerMap {
         this.clients[id] = undefined;
         this.clients.forEach(c => c?.sendLeave(id));
     }
+    encodeMovements() {
+        let offset = 0;
+        const ids = [...this.movementUpdated.keys()];
+        this.movementUpdated.clear();
+        const buffer = Buffer.alloc(1 + 6 * ids.length, 0);
+        buffer[offset++] = 2;
+        for (let index = 0; index < ids.length; index++) {
+            const client = this.clients[ids[index]];
+            if (!client)
+                continue;
+            const { x, y, right, vx, vy } = client.entity;
+            buffer.set((0, encoding_1.encodeMovement)(client.id, x, y, right, vx, vy), offset);
+            offset += 6;
+        }
+        return buffer;
+    }
     update(now) {
         let count = 0;
         if (now - this.lastCountUpdate >= 800) {
@@ -47,14 +64,12 @@ class ServerMap {
             });
         }
         (0, entityUtils_1.moveUpdate)(now, this.clients);
-        const updates = [...this.movementUpdated.values()];
-        const movementBuffer = Buffer.alloc(1 + 6 * updates.length, 0);
-        movementBuffer[0] = 2;
-        for (let i = 0; i < updates.length; i++) {
-            movementBuffer.set(updates[i], 1 + i * 6);
+        if (now - this.lastMovementUpdate >= 200) {
+            this.lastMovementUpdate = now;
+            const buffer = this.encodeMovements();
+            this.clients.forEach(c => c?.send(buffer));
         }
-        this.clients.forEach(c => c?.send(movementBuffer));
-        setTimeout(() => this.update(Date.now()), 100);
+        setTimeout(() => this.update(Date.now()), 20);
     }
 }
 exports.ServerMap = ServerMap;

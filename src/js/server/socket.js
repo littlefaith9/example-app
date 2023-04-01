@@ -31,13 +31,13 @@ class Client {
                 this.entity.right = right;
             }
             case 2: {
-                const { x, y, vx, vy, right } = (0, encoding_1.decodeMovement)(data[1], data[2], data[3], data[4], data[5], data[6]);
-                this.entity.x = x;
-                this.entity.y = y;
+                const { vx, vy } = (0, encoding_1.decodeVelocity)(data[1]);
                 this.entity.vx = vx;
                 this.entity.vy = vy;
-                this.entity.right = right;
-                server_1.map.movementUpdated.set(this.id, data.subarray(1, 6));
+                if (vx) {
+                    this.entity.right = vx > 0;
+                }
+                server_1.map.movementUpdated.add(this.id);
                 break;
             }
         }

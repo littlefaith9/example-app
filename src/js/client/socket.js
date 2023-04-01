@@ -73,8 +73,8 @@ class ServerAction {
         this.ws.send(new Uint8Array([0, ...(0, encoding_1.encodeId)(this.id), ...(0, encoding_1.encodePosition)(x, y, r)]));
     }
     sendMove() {
-        const { x, y, vx, vy, right } = this.game.player;
-        this.ws.send(new Uint8Array([2, ...(0, encoding_1.encodeMovement)(this.id, x, y, right, vx, vy)]));
+        const { vx, vy } = this.game.player;
+        this.ws.send(new Uint8Array([2, (0, encoding_1.encodeVelocity)(vx, vy)]));
     }
 }
 exports.ServerAction = ServerAction;

@@ -1,5 +1,5 @@
 import { WebSocket } from '../../cws';
-import { decodeId, decodeMovement, decodePosition, encodeId, encodePosition } from '../common/encoding';
+import { decodeId, decodePosition, decodeVelocity, encodeId, encodePosition } from '../common/encoding';
 import { createEntity } from '../common/entityUtils';
 import { Action } from '../common/interfaces';
 import { map } from './server';
@@ -31,13 +31,13 @@ export class Client {
 				this.entity.right = right;
 			}
 			case Action.Move: {
-				const { x, y, vx, vy, right } = decodeMovement(data[1], data[2], data[3], data[4], data[5], data[6]);
-				this.entity.x = x;
-				this.entity.y = y;
+				const { vx, vy } = decodeVelocity(data[1]);
 				this.entity.vx = vx;
 				this.entity.vy = vy;
-				this.entity.right = right;
-				map.movementUpdated.set(this.id, data.subarray(1, 6));
+				if (vx) {
+					this.entity.right = vx > 0;
+				}
+				map.movementUpdated.add(this.id);
 				break;
 			}
 		}
