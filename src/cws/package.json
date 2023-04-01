@@ -1,0 +1,7 @@
+{
+  "name": "cws",
+  "version": "v4.3.1",
+  "main": "./index.js",
+  "types": "./index.d.ts",
+  "description": "cWS - fast C++ WebSocket implementation for Node.js"
+}
