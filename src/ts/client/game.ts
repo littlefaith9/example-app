@@ -86,6 +86,7 @@ export class Game {
 				this.player.vy = 1;
 				break;
 		}
+		this.connection?.sendMove();
 	}
 	private handleKeyup({ key }: KeyboardEvent) {
 		switch (key) {
@@ -98,6 +99,7 @@ export class Game {
 				this.player.vy = 0;
 				break;
 		}
+		this.connection?.sendMove();
 	}
 	drawEntity(entity: EntityBase) {
 		this.context.save();

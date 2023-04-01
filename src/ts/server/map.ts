@@ -53,6 +53,6 @@ export class ServerMap {
 			movementBuffer.set(updates[i], 1 + i * 6);
 		}
 		this.clients.forEach(c => c?.send(movementBuffer));
-		setTimeout(() => this.update(Date.now()), 20);
+		setTimeout(() => this.update(Date.now()), 100);
 	}
 }
