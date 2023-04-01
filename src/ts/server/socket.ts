@@ -25,7 +25,6 @@ export class Client {
 				const id = decodeId(data[1], data[2]);
 				map.joinClient(this, id);
 				const {x, y, right} = decodePosition(data[3], data[4], data[5]);
-				console.log(x, y, right);
 				this.entity.id = id;
 				this.entity.x = x;
 				this.entity.y = y;

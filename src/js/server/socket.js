@@ -25,7 +25,6 @@ class Client {
                 const id = (0, encoding_1.decodeId)(data[1], data[2]);
                 server_1.map.joinClient(this, id);
                 const { x, y, right } = (0, encoding_1.decodePosition)(data[3], data[4], data[5]);
-                console.log(x, y, right);
                 this.entity.id = id;
                 this.entity.x = x;
                 this.entity.y = y;

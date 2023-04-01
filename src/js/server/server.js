@@ -12,7 +12,7 @@ const utils_1 = require("./utils");
 const PORT = 8090;
 const WS_PORT = 8091;
 const app = (0, express_1.default)();
-const socketServer = new cws_1.WebSocketServer({ port: WS_PORT }, () => console.log('WebSocket Server listening on port ' + WS_PORT));
+const socketServer = new cws_1.WebSocketServer({ port: WS_PORT }, () => console.log('WebSocket Server listening on port: ' + WS_PORT));
 exports.map = new map_1.ServerMap();
 app.use('/assets/', express_1.default.static((0, utils_1.pathTo)('assets')));
 app.use('/', express_1.default.static((0, utils_1.pathTo)('public')));
@@ -20,7 +20,7 @@ app.post('/api-join', (request, response) => {
     response.send(`${WS_PORT},${exports.map.assignId(request.body)}`);
 });
 app.listen(PORT, () => {
-    console.log(`Listening on port ${PORT}`);
+    console.log(`Listening on port: ${PORT}`);
 });
 socketServer.on('connection', ws => {
     new socket_1.Client(ws);

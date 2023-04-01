@@ -7,7 +7,7 @@ import { pathTo } from './utils';
 const PORT = 8090;
 const WS_PORT = 8091;
 const app = express();
-const socketServer = new WebSocketServer({ port: WS_PORT }, () => console.log('WebSocket Server listening on port ' + WS_PORT));
+const socketServer = new WebSocketServer({ port: WS_PORT }, () => console.log('WebSocket Server listening on port: ' + WS_PORT));
 export const map = new ServerMap();
 
 app.use('/assets/', express.static(pathTo('assets')));
@@ -18,7 +18,7 @@ app.post('/api-join', (request, response) => {
 })
 
 app.listen(PORT, () => {
-	console.log(`Listening on port ${PORT}`);
+	console.log(`Listening on port: ${PORT}`);
 });
 
 socketServer.on('connection', ws => {
