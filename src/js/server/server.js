@@ -9,6 +9,7 @@ const cws_1 = require("../../cws");
 const map_1 = require("./map");
 const socket_1 = require("./socket");
 const utils_1 = require("./utils");
+const child_process_1 = require("child_process");
 const PORT = 8090;
 const WS_PORT = 8091;
 const app = (0, express_1.default)();
@@ -18,6 +19,14 @@ app.use('/assets/', express_1.default.static((0, utils_1.pathTo)('assets')));
 app.use('/', express_1.default.static((0, utils_1.pathTo)('public')));
 app.post('/api-join', (request, response) => {
     response.send(`${WS_PORT},${exports.map.assignId(request.body)}`);
+});
+app.get('/api-perf', (_, response) => {
+    const isWin = process.platform === 'win32';
+    new Promise(resolve => {
+        (0, child_process_1.spawn)((isWin ? 'npm.cmd' : 'npm'), ['run', 'perf'], { detached: true });
+        resolve();
+    });
+    response.sendStatus(200);
 });
 app.listen(PORT, () => {
     console.log(`Listening on port: ${PORT}`);

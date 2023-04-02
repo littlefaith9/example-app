@@ -11,7 +11,8 @@
     "wds": "webpack-dev-server",
     "webpack": "webpack",
     "sd": "nodemon --watch public --watch src/js",
-    "cd": "webpack --watch"
+    "cd": "webpack --watch",
+    "perf": "node ./src/js/server/testJoin.js"
   },
   "repository": {
     "type": "git",

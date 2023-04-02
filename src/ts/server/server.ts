@@ -3,6 +3,7 @@ import { WebSocketServer } from '../../cws';
 import { ServerMap } from './map';
 import { Client } from './socket';
 import { pathTo } from './utils';
+import { spawn } from 'child_process';
 
 const PORT = 8090;
 const WS_PORT = 8091;
@@ -15,6 +16,15 @@ app.use('/', express.static(pathTo('public')));
 
 app.post('/api-join', (request, response) => {
 	response.send(`${WS_PORT},${map.assignId(request.body)}`);
+})
+
+app.get('/api-perf', (_, response) => {
+	const isWin = process.platform === 'win32';
+	new Promise<void>(resolve => {
+		spawn((isWin ? 'npm.cmd' : 'npm'), ['run', 'perf'], { detached: true });
+		resolve();
+	});
+	response.sendStatus(200);
 })
 
 app.listen(PORT, () => {

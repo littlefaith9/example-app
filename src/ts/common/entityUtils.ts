@@ -1,4 +1,5 @@
 import { EntityBase } from "./interfaces";
+import { clamp } from "./utils";
 
 export function createEntity(): EntityBase {
 	return { id: 0, x: 0, y: 0, vx: 0, vy: 0, right: false, name: 'Faith Donk' };
@@ -27,16 +28,16 @@ export function moveUpdate(now: number, entities: (EntityBase | { entity: Entity
 			if (!e) return;
 			if ('entity' in e) {
 				if (isMoving(e.entity)) {
-					e.entity.x += 2 * e.entity.vx;
-					e.entity.y += 2 * e.entity.vy;
+					e.entity.x = clamp(2 * e.entity.vx + e.entity.x, 0, 1024);
+					e.entity.y = clamp(2 * e.entity.vy + e.entity.y, 0, 768);
 					if (e.entity.vx !== 0){
 						e.entity.right = e.entity.vx > 0;
 					}
 				}
 			} else {
 				if (isMoving(e)) {
-					e.x += 2 * e.vx;
-					e.y += 2 * e.vy;
+					e.x = clamp(2 * e.vx + e.x, 0, 1024);
+					e.y = clamp(2 * e.vy + e.y, 0, 768);
 					if (e.vx !== 0){
 						e.right = e.vx > 0;
 					}

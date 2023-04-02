@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.moveUpdate = exports.isMoving = exports.randomPosition = exports.createFromJoin = exports.createEntity = void 0;
+const utils_1 = require("./utils");
 function createEntity() {
     return { id: 0, x: 0, y: 0, vx: 0, vy: 0, right: false, name: 'Faith Donk' };
 }
@@ -29,8 +30,8 @@ function moveUpdate(now, entities) {
                 return;
             if ('entity' in e) {
                 if (isMoving(e.entity)) {
-                    e.entity.x += 2 * e.entity.vx;
-                    e.entity.y += 2 * e.entity.vy;
+                    e.entity.x = (0, utils_1.clamp)(2 * e.entity.vx + e.entity.x, 0, 1024);
+                    e.entity.y = (0, utils_1.clamp)(2 * e.entity.vy + e.entity.y, 0, 768);
                     if (e.entity.vx !== 0) {
                         e.entity.right = e.entity.vx > 0;
                     }
@@ -38,8 +39,8 @@ function moveUpdate(now, entities) {
             }
             else {
                 if (isMoving(e)) {
-                    e.x += 2 * e.vx;
-                    e.y += 2 * e.vy;
+                    e.x = (0, utils_1.clamp)(2 * e.vx + e.x, 0, 1024);
+                    e.y = (0, utils_1.clamp)(2 * e.vy + e.y, 0, 768);
                     if (e.vx !== 0) {
                         e.right = e.vx > 0;
                     }
