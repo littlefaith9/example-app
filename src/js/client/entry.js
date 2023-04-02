@@ -11,6 +11,7 @@ document.title = nickname;
     const uibar = (0, ui_1.createDiv)();
     (0, ui_1.createInfoText)(uibar);
     (0, ui_1.createTestButton)(uibar);
+    (0, ui_1.createTestHashButton)(uibar);
     const err = console.error;
     console.error = (...data) => {
         err(...data);

@@ -117,6 +117,7 @@ export class Game {
 		}
 	}
 	private drawEntity(entity: EntityBase) {
+		// draw entity
 		this.context.save();
 		let right = 1;
 		if (entity.right) {
@@ -130,6 +131,16 @@ export class Game {
 			this.context.translate(-sprites['faith_stand'].centerX, -sprites['faith_stand'].centerY);
 			this.context.drawImage(sprites['faith_stand'].frames[0], right * entity.x, entity.y);
 		}
+		this.context.restore();
+
+		// draw name
+		this.context.save();
+		this.context.translate(0, -60);
+		this.context.strokeStyle = '#000';
+		this.context.lineWidth = 2;
+		this.context.strokeText(entity.name, entity.x, entity.y);
+		this.context.fillStyle = '#fff';
+		this.context.fillText(entity.name, entity.x, entity.y);
 		this.context.restore();
 	}
 	reconnect() {

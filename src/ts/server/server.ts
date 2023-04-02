@@ -17,7 +17,7 @@ app.use('/', express.static(pathTo('public')));
 
 app.post('/api-join', bodyParser.text(), (request, response) => {
 	response.send(`${WS_PORT},${map.assignId(request.body)}`);
-})
+});
 
 app.get('/api-perf', (_, response) => {
 	const isWin = process.platform === 'win32';
@@ -26,7 +26,16 @@ app.get('/api-perf', (_, response) => {
 		resolve();
 	});
 	response.sendStatus(200);
-})
+});
+
+app.get('/api-perf-hash', (_, response) => {
+	const isWin = process.platform === 'win32';
+	new Promise<void>(resolve => {
+		spawn((isWin ? 'npm.cmd' : 'npm'), ['run', 'perf', '--', '--hash'], { detached: true });
+		resolve();
+	});
+	response.sendStatus(200);
+});
 
 app.listen(PORT, () => {
 	console.log(`Listening on port: ${PORT}`);

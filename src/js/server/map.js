@@ -24,25 +24,27 @@ class ServerMap {
         }
     }
     joinClient(client, id) {
-        this.clients.forEach(c => c?.sendJoin(id, client.entity.x, client.entity.y, client.entity.right));
-        client.sendMap();
-        this.clients[id] = client;
         const name = this.nameMapping.get(id);
+        client.entity.name = name || '';
+        this.nameMapping.delete(id);
         if (name === undefined) {
             console.warn('Missing preserved name for client id: ' + id);
         }
-        client.entity.name = name || 'Unknown';
-        this.nameMapping.delete(id);
+        client.sendMap();
+        const ids = [];
+        this.clients.forEach(c => c && ids.push(c.id));
+        const movement = this.encodeMovements(ids);
+        client.send(movement);
         client.leave = this.leaveClient.bind(this);
+        this.clients.forEach(c => c?.sendJoin(id, client));
+        this.clients[id] = client;
     }
     leaveClient(id) {
         this.clients[id] = undefined;
         this.clients.forEach(c => c?.sendLeave(id));
     }
-    encodeMovements() {
-        const ids = [...this.movementUpdated.keys()];
+    encodeMovements(ids) {
         const buffer = Buffer.alloc(1 + 6 * ids.length, 0);
-        this.movementUpdated.clear();
         let offset = 0;
         buffer[offset++] = 2;
         for (let index = 0; index < ids.length; index++) {
@@ -59,7 +61,9 @@ class ServerMap {
         (0, entityUtils_1.moveUpdate)(now, this.clients);
         if (now - this.lastMovementUpdate >= 50) {
             this.lastMovementUpdate = now;
-            const buffer = this.encodeMovements();
+            const ids = [...this.movementUpdated.keys()];
+            this.movementUpdated.clear();
+            const buffer = this.encodeMovements(ids);
             this.clients.forEach(c => c?.send(buffer));
         }
         setTimeout(() => this.update(Date.now()), 10);

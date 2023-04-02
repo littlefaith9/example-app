@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.decodeMovement = exports.encodeMovement = exports.decodeVelocity = exports.encodeVelocity = exports.decodePosition = exports.encodePosition = exports.decodeId = exports.encodeId = void 0;
+exports.decodeText = exports.encodeText = exports.MAX_TEXT_SIZE = exports.decodeMovement = exports.encodeMovement = exports.decodeVelocity = exports.encodeVelocity = exports.decodePosition = exports.encodePosition = exports.decodeId = exports.encodeId = void 0;
 function encodeId(id) {
     return [id & 0xff, id >> 8 & 0xff];
 }
@@ -47,3 +47,20 @@ function decodeMovement(a, b, c, d, e, f) {
     return { id, ...xyr, ...v };
 }
 exports.decodeMovement = decodeMovement;
+exports.MAX_TEXT_SIZE = 0xf;
+function encodeText(text) {
+    const encoder = new TextEncoder();
+    const buffer = encoder.encode(text);
+    if (buffer.length > exports.MAX_TEXT_SIZE) {
+        console.warn(`Max text size reached: ${buffer.length}/${exports.MAX_TEXT_SIZE}`);
+        return buffer.slice(0, exports.MAX_TEXT_SIZE - 1);
+    }
+    return buffer;
+}
+exports.encodeText = encodeText;
+function decodeText(data, offset = 0) {
+    const decoder = new TextDecoder();
+    const length = data[offset++];
+    return decoder.decode(data.slice(offset, offset + length));
+}
+exports.decodeText = decodeText;

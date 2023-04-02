@@ -89,21 +89,27 @@ class Game {
         }
     }
     handleKeyup({ key }) {
+        let vx = this.player.vx;
+        let vy = this.player.vy;
         switch (key) {
             case 'a':
             case 'd':
             case 'ArrowLeft':
             case 'ArrowRight':
-                this.player.vx = 0;
+                vx = 0;
                 break;
             case 'w':
             case 's':
             case 'ArrowUp':
             case 'ArrowDown':
-                this.player.vy = 0;
+                vy = 0;
                 break;
         }
-        this.connection?.sendMove(0, 0);
+        if (vx !== this.player.vx || vy !== this.player.vy) {
+            this.player.vx = vx;
+            this.player.vy = vy;
+            this.connection?.sendMove(vx, vy);
+        }
     }
     drawEntity(entity) {
         this.context.save();
@@ -120,6 +126,14 @@ class Game {
             this.context.translate(-sprites_1.sprites['faith_stand'].centerX, -sprites_1.sprites['faith_stand'].centerY);
             this.context.drawImage(sprites_1.sprites['faith_stand'].frames[0], right * entity.x, entity.y);
         }
+        this.context.restore();
+        this.context.save();
+        this.context.translate(0, -60);
+        this.context.strokeStyle = '#000';
+        this.context.lineWidth = 2;
+        this.context.strokeText(entity.name, entity.x, entity.y);
+        this.context.fillStyle = '#fff';
+        this.context.fillText(entity.name, entity.x, entity.y);
         this.context.restore();
     }
     reconnect() {

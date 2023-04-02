@@ -5,13 +5,14 @@ const encoding_1 = require("../common/encoding");
 const entityUtils_1 = require("../common/entityUtils");
 const utils_1 = require("../common/utils");
 const clients = [];
+const hashed = process.argv.includes('--hash');
 async function requestJoin() {
     const request = await fetch('http://localhost:8090/api-join', {
         method: 'POST',
         headers: {
             'Content-Type': 'text/plain'
         },
-        body: 'Perf',
+        body: hashed ? (0, utils_1.randomString)(15) : '',
     });
     const [port, id] = await request.text().then(t => t.split(','));
     const entity = (0, entityUtils_1.randomPosition)((0, entityUtils_1.createEntity)());
@@ -38,7 +39,7 @@ process.stdin.on('data', ev => {
     while (true) {
         for (let client of clients) {
             const movement = Math.random();
-            if (!moving || movement < 0.3) {
+            if (!moving) {
                 client.send(Buffer.from([2, (0, encoding_1.encodeVelocity)(0, 0)]));
             }
             else if (movement < 0.6) {

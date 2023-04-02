@@ -6,8 +6,8 @@ function createEntity() {
     return { id: 0, x: 0, y: 0, vx: 0, vy: 0, right: false, name: 'Faith Donk' };
 }
 exports.createEntity = createEntity;
-function createFromJoin(id, x, y, right) {
-    return { id, x, y, right, vx: 0, vy: 0, name: 'Faith Donk' };
+function createFromJoin(id, x, y, right, name) {
+    return { id, x, y, right, vx: 0, vy: 0, name };
 }
 exports.createFromJoin = createFromJoin;
 function randomPosition(entity) {

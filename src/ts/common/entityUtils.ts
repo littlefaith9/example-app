@@ -5,8 +5,8 @@ export function createEntity(): EntityBase {
 	return { id: 0, x: 0, y: 0, vx: 0, vy: 0, right: false, name: 'Faith Donk' };
 }
 
-export function createFromJoin(id: number, x: number, y: number, right: boolean): EntityBase {
-	return { id, x, y, right, vx: 0, vy: 0, name: 'Faith Donk' /* TODO: implement */ };
+export function createFromJoin(id: number, x: number, y: number, right: boolean, name: string): EntityBase {
+	return { id, x, y, right, vx: 0, vy: 0, name };
 }
 
 export function randomPosition(entity: EntityBase) {

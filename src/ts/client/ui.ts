@@ -12,6 +12,16 @@ export function createTestButton(container = document.body) {
 	return button;
 }
 
+export function createTestHashButton(container = document.body) {
+	const button = document.createElement('button');
+	button.innerText = 'Add 100 hashed clients';
+	container.appendChild(button);
+	button.onclick = () => {
+		fetch('/api-perf-hash', { method: 'GET' });
+	}
+	return button;
+}
+
 let infoTextElement = document.createElement('div');
 export function createInfoText(container = document.body) {
 	container.appendChild(infoTextElement);

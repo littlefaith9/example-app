@@ -1,4 +1,4 @@
-import { decodeId, decodeMovement, decodePosition, encodeId, encodeVelocity, encodePosition } from '../common/encoding';
+import { decodeId, decodeMovement, decodePosition, encodeId, encodeVelocity, encodePosition, decodeText } from '../common/encoding';
 import { createFromJoin } from '../common/entityUtils';
 import { Action } from '../common/interfaces';
 import { Game } from './game';
@@ -24,7 +24,8 @@ export class ServerAction {
 				const id = decodeId(buffer[1], buffer[2]);
 				if (id === this.id) break;
 				const { x, y, right } = decodePosition(buffer[3], buffer[4], buffer[5]);
-				this.game.entities.push(createFromJoin(id, x, y, right));
+				const name = decodeText(buffer, 6);
+				this.game.entities.push(createFromJoin(id, x, y, right, name));
 				break;
 			}
 			case Action.Map: {
@@ -33,7 +34,10 @@ export class ServerAction {
 					const id = decodeId(buffer[i++], buffer[i++]);
 					if (id === this.id) { i += 3; continue; }
 					const { x, y, right } = decodePosition(buffer[i++], buffer[i++], buffer[i++]);
-					this.game.entities.push(createFromJoin(id, x, y, right));
+					const name = decodeText(buffer, i);
+					const length = buffer[i++];
+					i += length;
+					this.game.entities.push(createFromJoin(id, x, y, right, name));
 				}
 				break;
 			}
@@ -41,7 +45,7 @@ export class ServerAction {
 				const id = decodeId(buffer[1], buffer[2]);
 				const index = this.game.entities.findIndex(e => e.id === id);
 				if (index !== -1) {
-					this.game.entities.splice(index);
+					this.game.entities.splice(index, 1);
 				}
 			case Action.Move:
 				let i = 1;

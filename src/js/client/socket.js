@@ -29,7 +29,8 @@ class ServerAction {
                 if (id === this.id)
                     break;
                 const { x, y, right } = (0, encoding_1.decodePosition)(buffer[3], buffer[4], buffer[5]);
-                this.game.entities.push((0, entityUtils_1.createFromJoin)(id, x, y, right));
+                const name = (0, encoding_1.decodeText)(buffer, 6);
+                this.game.entities.push((0, entityUtils_1.createFromJoin)(id, x, y, right, name));
                 break;
             }
             case 4: {
@@ -41,7 +42,10 @@ class ServerAction {
                         continue;
                     }
                     const { x, y, right } = (0, encoding_1.decodePosition)(buffer[i++], buffer[i++], buffer[i++]);
-                    this.game.entities.push((0, entityUtils_1.createFromJoin)(id, x, y, right));
+                    const name = (0, encoding_1.decodeText)(buffer, i);
+                    const length = buffer[i++];
+                    i += length;
+                    this.game.entities.push((0, entityUtils_1.createFromJoin)(id, x, y, right, name));
                 }
                 break;
             }
@@ -49,7 +53,7 @@ class ServerAction {
                 const id = (0, encoding_1.decodeId)(buffer[1], buffer[2]);
                 const index = this.game.entities.findIndex(e => e.id === id);
                 if (index !== -1) {
-                    this.game.entities.splice(index);
+                    this.game.entities.splice(index, 1);
                 }
             case 2:
                 let i = 1;

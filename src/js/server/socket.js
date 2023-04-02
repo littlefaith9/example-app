@@ -47,23 +47,36 @@ class Client {
         this.ws.send(data);
     }
     sendMap() {
-        const buffer = Buffer.alloc(1 + 5 * server_1.map.clients.length, 0);
+        const buffer = Buffer.alloc(255, 0);
         buffer[0] = 4;
         let last = 1;
         for (let i = 0; i < server_1.map.clients.length; i++) {
+            if (last > 200) {
+                this.ws.send(buffer.subarray(0, last));
+                buffer.fill(0);
+                buffer[0] = 4;
+                last = 1;
+            }
             const client = server_1.map.clients[i];
             if (!client)
                 continue;
-            buffer.set((0, encoding_1.encodeId)(client.id), 1 + 5 * i);
-            buffer.set((0, encoding_1.encodePosition)(client.entity.x, client.entity.y, client.entity.right), 1 + 5 * i + 2);
+            let offset = last;
+            buffer.set((0, encoding_1.encodeId)(client.id), offset);
+            buffer.set((0, encoding_1.encodePosition)(client.entity.x, client.entity.y, client.entity.right), offset + 2);
             last += 5;
+            const name = (0, encoding_1.encodeText)(client.entity.name);
+            buffer.set([name.length], offset + 5);
+            buffer.set(name, offset + 6);
+            last += 1 + name.length;
         }
         this.ws.send(buffer.subarray(0, last));
     }
-    sendJoin(id, x, y, r) {
+    sendJoin(id, client) {
+        const { x, y, right, name } = client.entity;
         const [a, b] = (0, encoding_1.encodeId)(id);
-        const [c, d, e] = (0, encoding_1.encodePosition)(x, y, r);
-        this.ws.send(Buffer.from([0, a, b, c, d, e]));
+        const [c, d, e] = (0, encoding_1.encodePosition)(x, y, right);
+        const f = (0, encoding_1.encodeText)(name);
+        this.ws.send(Buffer.from([0, a, b, c, d, e, f.length, ...f]));
     }
     sendClientStat(stat) {
         const encoded = Buffer.from(stat, 'utf-8');

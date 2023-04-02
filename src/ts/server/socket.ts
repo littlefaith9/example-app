@@ -1,5 +1,5 @@
 import { WebSocket } from '../../cws';
-import { decodeId, decodePosition, decodeVelocity, encodeId, encodePosition } from '../common/encoding';
+import { decodeId, decodePosition, decodeVelocity, encodeId, encodePosition, encodeText } from '../common/encoding';
 import { createEntity } from '../common/entityUtils';
 import { Action } from '../common/interfaces';
 import { map } from './server';
@@ -47,22 +47,37 @@ export class Client {
 		this.ws.send(data);
 	}
 	sendMap() {
-		const buffer = Buffer.alloc(1 + 5 * map.clients.length, 0);
+		const buffer = Buffer.alloc(255, 0);
 		buffer[0] = Action.Map;
 		let last = 1;
 		for (let i = 0; i < map.clients.length; i++) {
+			if (last > 200) {
+				this.ws.send(buffer.subarray(0, last));
+				buffer.fill(0);
+				buffer[0] = Action.Map;
+				last = 1;
+			}
 			const client = map.clients[i];
 			if (!client) continue;
-			buffer.set(encodeId(client.id), 1 + 5 * i);
-			buffer.set(encodePosition(client.entity.x, client.entity.y, client.entity.right), 1 + 5 * i + 2);
+
+			let offset = last;
+			buffer.set(encodeId(client.id), offset);
+			buffer.set(encodePosition(client.entity.x, client.entity.y, client.entity.right), offset + 2);
 			last += 5;
+
+			const name = encodeText(client.entity.name);
+			buffer.set([name.length], offset + 5);
+			buffer.set(name, offset + 6);
+			last += 1 + name.length;
 		}
 		this.ws.send(buffer.subarray(0, last));
 	}
-	sendJoin(id: number, x: number, y: number, r: boolean/*, name: string */) {
+	sendJoin(id: number, client: Client) {
+		const { x, y, right, name } = client.entity;
 		const [a, b] = encodeId(id);
-		const [c, d, e] = encodePosition(x, y, r);
-		this.ws.send(Buffer.from([Action.Join, a, b, c, d, e]));
+		const [c, d, e] = encodePosition(x, y, right);
+		const f = encodeText(name);
+		this.ws.send(Buffer.from([Action.Join, a, b, c, d, e, f.length, ...f]));
 	}
 	sendClientStat(stat: string) {
 		const encoded = Buffer.from(stat, 'utf-8');

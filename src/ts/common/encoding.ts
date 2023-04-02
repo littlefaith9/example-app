@@ -43,3 +43,20 @@ export function decodeMovement(a: number, b: number, c: number, d: number, e: nu
 	const v = decodeVelocity(f);
 	return { id, ...xyr, ...v };
 }
+
+export const MAX_TEXT_SIZE = 0xf;
+export function encodeText(text: string) {
+	const encoder = new TextEncoder();
+	const buffer = encoder.encode(text);
+	if (buffer.length > MAX_TEXT_SIZE) {
+		console.warn(`Max text size reached: ${buffer.length}/${MAX_TEXT_SIZE}`);
+		return buffer.slice(0, MAX_TEXT_SIZE - 1)
+	}
+	return buffer;
+}
+
+export function decodeText(data: Uint8Array, offset = 0) {
+	const decoder = new TextDecoder();
+	const length = data[offset++];
+	return decoder.decode(data.slice(offset, offset + length));
+}

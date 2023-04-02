@@ -2,9 +2,10 @@ import { WebSocket } from '../../cws';
 import { encodeId, encodePosition, encodeVelocity } from '../common/encoding';
 import { createEntity, randomPosition } from '../common/entityUtils';
 import { Action } from '../common/interfaces';
-import { delay } from '../common/utils';
+import { delay, randomString } from '../common/utils';
 
 const clients: WebSocket[] = [];
+const hashed = process.argv.includes('--hash');
 
 async function requestJoin() {
 	const request = await fetch('http://localhost:8090/api-join', {
@@ -12,7 +13,7 @@ async function requestJoin() {
 		headers: {
 			'Content-Type': 'text/plain'
 		},
-		body: 'Perf',
+		body: hashed ? randomString(15) : '',
 	});
 	const [port, id] = await request.text().then(t => t.split(','));
 	const entity = randomPosition(createEntity());
@@ -42,7 +43,7 @@ process.stdin.on('data', ev => {
 	while (true) {
 		for (let client of clients) {
 			const movement = Math.random();
-			if (!moving || movement < 0.3) {
+			if (!moving) {
 				client.send(Buffer.from([Action.Move, encodeVelocity(0, 0)]));
 			} else if (movement < 0.6) {
 				const vx = Math.floor(Math.random() * 3) - 1;

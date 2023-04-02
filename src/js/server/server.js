@@ -29,6 +29,14 @@ app.get('/api-perf', (_, response) => {
     });
     response.sendStatus(200);
 });
+app.get('/api-perf-hash', (_, response) => {
+    const isWin = process.platform === 'win32';
+    new Promise(resolve => {
+        (0, child_process_1.spawn)((isWin ? 'npm.cmd' : 'npm'), ['run', 'perf', '--', '--hash'], { detached: true });
+        resolve();
+    });
+    response.sendStatus(200);
+});
 app.listen(PORT, () => {
     console.log(`Listening on port: ${PORT}`);
 });

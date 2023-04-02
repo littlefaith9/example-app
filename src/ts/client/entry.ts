@@ -1,6 +1,6 @@
 import { Game } from './game';
 import { initSprites } from './sprites';
-import { createDiv, createInfoText, createTestButton } from './ui';
+import { createDiv, createInfoText, createTestButton, createTestHashButton } from './ui';
 
 const defaultName = 'Faith Donk';
 const nickname = prompt('Enter your nickname to join', defaultName) ?? defaultName;
@@ -11,6 +11,7 @@ initSprites().then(() => {
 	const uibar = createDiv();
 	createInfoText(uibar);
 	createTestButton(uibar);
+	createTestHashButton(uibar);
 
 	// errors print to page
 	const err = console.error;
