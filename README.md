@@ -1,5 +1,7 @@
 # example-app
- The example client-server application
+- The example client-server application
+> Implement client and server applications.
+> Multiple clients can connect to the server and move around in a virtual space. Movement of one client should be visible to all of the connected clients. Assume that at least 500 clients can be connected at once.
 
 ## Setting up the project
 - Make sure you have NodeJS v18 installed. (Only supported version for this project)
