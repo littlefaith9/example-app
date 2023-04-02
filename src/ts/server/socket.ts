@@ -23,12 +23,13 @@ export class Client {
 		switch (action) {
 			case Action.Join: {
 				const id = decodeId(data[1], data[2]);
-				map.joinClient(this, id);
 				const {x, y, right} = decodePosition(data[3], data[4], data[5]);
 				this.entity.id = id;
 				this.entity.x = x;
 				this.entity.y = y;
 				this.entity.right = right;
+				map.joinClient(this, id);
+				break;
 			}
 			case Action.Move: {
 				const { vx, vy } = decodeVelocity(data[1]);
@@ -61,8 +62,9 @@ export class Client {
 		const [c, d, e] = encodePosition(x, y, r);
 		this.ws.send(Buffer.from([Action.Join, a, b, c, d, e]));
 	}
-	sendClientCount(count: number) {
-		this.ws.send(Buffer.from([Action.ClientsCount, count]));
+	sendClientStat(stat: string) {
+		const encoded = Buffer.from(stat, 'utf-8');
+		this.ws.send(Buffer.from([Action.ClientsStat, ...encoded]));
 	}
 	sendLeave(id: number) {
 		const [a, b] = encodeId(id);

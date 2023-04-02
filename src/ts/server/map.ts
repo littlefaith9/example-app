@@ -5,7 +5,7 @@ import { Client } from "./socket";
 
 export class ServerMap {
 	clients: (Client | undefined)[] = [];
-	lastCountUpdate = 0;
+	lastStatUpdate = 0;
 	lastMovementUpdate = 0;
 	movementUpdated = new Set<number>();
 	nameMapping = new Map<number, string>()
@@ -54,13 +54,12 @@ export class ServerMap {
 		return buffer;
 	}
 	update(now: number) {
-		let count = 0;
-		if (now - this.lastCountUpdate >= 800) {
-			this.clients.forEach(c => {
-				!!c && count++;
-				c?.sendClientCount(count);
-			});
-		}
+		// if (now - this.lastStatUpdate >= 800) {
+		// 	this.lastStatUpdate = now;
+		// 	this.clients.forEach(c => {
+		// 		c?.sendClientStat(JSON.stringify(c.entity));
+		// 	});
+		// }
 		moveUpdate(now, this.clients);
 		if (now - this.lastMovementUpdate >= 200) {
 			this.lastMovementUpdate = now;

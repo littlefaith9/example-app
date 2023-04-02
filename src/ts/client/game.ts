@@ -22,7 +22,7 @@ export class Game {
 	connection?: ServerAction;
 	player = testEntity;
 	readonly entities: EntityBase[] = [testEntity];
-	clients = 0;
+	serverStat = '';
 	constructor (nickname: string, container = document.body) {
 		// create canvas
 		this.canvas = document.createElement('canvas');
@@ -53,7 +53,7 @@ export class Game {
 		return this.canvas.height;
 	}
 	get infoText() {
-		return `fps ${Math.floor(this.fps)} | clients ${this.clients} | connected ${!!this.connection?.connected} | ${testEntity}`
+		return `fps ${Math.floor(this.fps)} | connected ${!!this.connection?.connected} | (${this.player.x}, ${this.player.y}, ${this.player.right}) | ${this.serverStat}`
 	}
 	private drawMap() {
 		// if there's no saved buffer, create it

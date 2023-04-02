@@ -12,8 +12,8 @@ export class ServerAction {
 		const buffer = new Uint8Array(await data.arrayBuffer());
 		const action = buffer[0];
 		switch (action) {
-			case Action.ClientsCount:
-				this.game.clients = buffer[1];
+			case Action.ClientsStat:
+				this.game.serverStat = await data.slice(1).text();
 				break;
 			case Action.Join: {
 				const id = decodeId(buffer[1], buffer[2]);

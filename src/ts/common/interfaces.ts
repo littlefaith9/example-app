@@ -12,6 +12,6 @@ export const enum Action {
 	Join,
 	Leave,
 	Move,
-	ClientsCount,
+	ClientsStat,
 	Map,
 }

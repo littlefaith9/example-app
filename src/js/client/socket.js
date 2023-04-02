@@ -16,7 +16,7 @@ class ServerAction {
         const action = buffer[0];
         switch (action) {
             case 3:
-                this.game.clients = buffer[1];
+                this.game.serverStat = await data.slice(1).text();
                 break;
             case 0: {
                 const id = (0, encoding_1.decodeId)(buffer[1], buffer[2]);

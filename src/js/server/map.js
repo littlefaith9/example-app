@@ -6,7 +6,7 @@ const entityUtils_1 = require("../common/entityUtils");
 class ServerMap {
     constructor() {
         this.clients = [];
-        this.lastCountUpdate = 0;
+        this.lastStatUpdate = 0;
         this.lastMovementUpdate = 0;
         this.movementUpdated = new Set();
         this.nameMapping = new Map();
@@ -56,13 +56,6 @@ class ServerMap {
         return buffer;
     }
     update(now) {
-        let count = 0;
-        if (now - this.lastCountUpdate >= 800) {
-            this.clients.forEach(c => {
-                !!c && count++;
-                c?.sendClientCount(count);
-            });
-        }
         (0, entityUtils_1.moveUpdate)(now, this.clients);
         if (now - this.lastMovementUpdate >= 200) {
             this.lastMovementUpdate = now;

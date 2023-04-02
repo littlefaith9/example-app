@@ -18,7 +18,7 @@ class Game {
         this.fps = 0;
         this.player = testEntity;
         this.entities = [testEntity];
-        this.clients = 0;
+        this.serverStat = '';
         this.canvas = document.createElement('canvas');
         this.canvas.width = exports.CANVAS_WIDTH;
         this.canvas.height = exports.CANVAS_HEIGHT;
@@ -44,7 +44,7 @@ class Game {
         return this.canvas.height;
     }
     get infoText() {
-        return `fps ${Math.floor(this.fps)} | clients ${this.clients} | connected ${!!this.connection?.connected} | ${testEntity}`;
+        return `fps ${Math.floor(this.fps)} | connected ${!!this.connection?.connected} | (${this.player.x}, ${this.player.y}, ${this.player.right}) | ${this.serverStat}`;
     }
     drawMap() {
         if (!this.mapBuffer) {
