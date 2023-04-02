@@ -8,6 +8,7 @@ interface Sprite {
 }
 
 export const sprites: { [name: string]: Sprite } = {}
+export let trotFrames = 0;
 
 const loadImage = (name: string) => new Promise<HTMLImageElement>((resolve, reject) => {
 	const image = document.createElement('img');
@@ -58,4 +59,5 @@ export async function initSprites() {
 	createSprite('tile_grass', grassImage, 32, 24, 0, 0);
 	createSprite('faith_trot', trotAnimation, 43, 56, 22, 53);
 	createSprite('faith_stand', standImage, 43, 54, 22, 51);
+	trotFrames = sprites['faith_trot'].frames.length;
 }

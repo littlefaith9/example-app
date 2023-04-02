@@ -30,8 +30,8 @@ function moveUpdate(now, entities) {
                 return;
             if ('entity' in e) {
                 if (isMoving(e.entity)) {
-                    e.entity.x = (0, utils_1.clamp)(2 * e.entity.vx + e.entity.x, 0, 1024);
-                    e.entity.y = (0, utils_1.clamp)(2 * e.entity.vy + e.entity.y, 0, 768);
+                    e.entity.x = (0, utils_1.clamp)(3 * e.entity.vx + e.entity.x, 0, 1024);
+                    e.entity.y = (0, utils_1.clamp)(3 * e.entity.vy + e.entity.y, 0, 768);
                     if (e.entity.vx !== 0) {
                         e.entity.right = e.entity.vx > 0;
                     }

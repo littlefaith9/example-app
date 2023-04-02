@@ -1,7 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.initSprites = exports.TILE_HEIGHT = exports.TILE_WIDTH = exports.createCanvas = exports.sprites = void 0;
+exports.initSprites = exports.TILE_HEIGHT = exports.TILE_WIDTH = exports.createCanvas = exports.trotFrames = exports.sprites = void 0;
 exports.sprites = {};
+exports.trotFrames = 0;
 const loadImage = (name) => new Promise((resolve, reject) => {
     const image = document.createElement('img');
     const timeout = setTimeout(() => reject('request timed out'), 5000);
@@ -47,5 +48,6 @@ async function initSprites() {
     createSprite('tile_grass', grassImage, 32, 24, 0, 0);
     createSprite('faith_trot', trotAnimation, 43, 56, 22, 53);
     createSprite('faith_stand', standImage, 43, 54, 22, 51);
+    exports.trotFrames = exports.sprites['faith_trot'].frames.length;
 }
 exports.initSprites = initSprites;

@@ -11,4 +11,10 @@ document.title = nickname;
     const uibar = (0, ui_1.createDiv)();
     (0, ui_1.createInfoText)(uibar);
     (0, ui_1.createTestButton)(uibar);
+    const err = console.error;
+    console.error = (...data) => {
+        err(...data);
+        const errorText = (0, ui_1.createDiv)(uibar);
+        errorText.innerHTML = '[error]' + data.join(' ');
+    };
 });

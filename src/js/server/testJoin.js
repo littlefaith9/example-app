@@ -14,8 +14,8 @@ async function requestJoin() {
         body: 'Perf',
     });
     const [port, id] = await request.text().then(t => t.split(','));
-    const ws = new cws_1.WebSocket(`ws://localhost:${port}/`);
     const entity = (0, entityUtils_1.randomPosition)((0, entityUtils_1.createEntity)());
+    const ws = new cws_1.WebSocket(`ws://localhost:${port}/`);
     ws.on('open', () => ws.send(Buffer.from([0, ...(0, encoding_1.encodeId)(parseInt(id, 10)), ...(0, encoding_1.encodePosition)(entity.x, entity.y, entity.right)])));
     clients.push(ws);
 }

@@ -4,6 +4,7 @@ import { ServerMap } from './map';
 import { Client } from './socket';
 import { pathTo } from './utils';
 import { spawn } from 'child_process';
+import bodyParser from 'body-parser';
 
 const PORT = 8090;
 const WS_PORT = 8091;
@@ -14,7 +15,7 @@ export const map = new ServerMap();
 app.use('/assets/', express.static(pathTo('assets')));
 app.use('/', express.static(pathTo('public')));
 
-app.post('/api-join', (request, response) => {
+app.post('/api-join', bodyParser.text(), (request, response) => {
 	response.send(`${WS_PORT},${map.assignId(request.body)}`);
 })
 

@@ -1,5 +1,5 @@
-import { EntityBase } from "./interfaces";
-import { clamp } from "./utils";
+import { EntityBase } from './interfaces';
+import { clamp } from './utils';
 
 export function createEntity(): EntityBase {
 	return { id: 0, x: 0, y: 0, vx: 0, vy: 0, right: false, name: 'Faith Donk' };
@@ -20,6 +20,7 @@ export function isMoving(entity: EntityBase) {
 	return entity.vx !== 0 || entity.vy !== 0;
 }
 
+// TODO: optimize
 let lastMoveUpdate = 0;
 export function moveUpdate(now: number, entities: (EntityBase | { entity: EntityBase } | undefined)[]) {
 	if (now - lastMoveUpdate >= 20) {
@@ -28,8 +29,9 @@ export function moveUpdate(now: number, entities: (EntityBase | { entity: Entity
 			if (!e) return;
 			if ('entity' in e) {
 				if (isMoving(e.entity)) {
-					e.entity.x = clamp(2 * e.entity.vx + e.entity.x, 0, 1024);
-					e.entity.y = clamp(2 * e.entity.vy + e.entity.y, 0, 768);
+					// Note: Changing 2 to 3 due to unknown delay
+					e.entity.x = clamp(3 * e.entity.vx + e.entity.x, 0, 1024);
+					e.entity.y = clamp(3 * e.entity.vy + e.entity.y, 0, 768);
 					if (e.entity.vx !== 0){
 						e.entity.right = e.entity.vx > 0;
 					}

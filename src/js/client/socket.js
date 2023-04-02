@@ -9,9 +9,15 @@ class ServerAction {
         this.game = game;
         this.id = id;
         ws.onmessage = ev => this.handleMsg(ev);
+        ws.onclose = () => {
+            game.entities.length = 0;
+            setTimeout(() => game.reconnect(), 3000);
+        };
         this.game.player.id = id;
     }
     async handleMsg({ data }) {
+        if (!data.size)
+            return;
         const buffer = new Uint8Array(await data.arrayBuffer());
         const action = buffer[0];
         switch (action) {
@@ -30,9 +36,11 @@ class ServerAction {
                 let i = 1;
                 while (i < buffer.length) {
                     const id = (0, encoding_1.decodeId)(buffer[i++], buffer[i++]);
-                    const { x, y, right } = (0, encoding_1.decodePosition)(buffer[i++], buffer[i++], buffer[i++]);
-                    if (id === this.id)
+                    if (id === this.id) {
+                        i += 3;
                         continue;
+                    }
+                    const { x, y, right } = (0, encoding_1.decodePosition)(buffer[i++], buffer[i++], buffer[i++]);
                     this.game.entities.push((0, entityUtils_1.createFromJoin)(id, x, y, right));
                 }
                 break;
@@ -52,9 +60,9 @@ class ServerAction {
                         console.warn('Cannot find entity ' + id);
                         continue;
                     }
+                    entity.right = right;
                     entity.x = x;
                     entity.y = y;
-                    entity.right = right;
                     if (id !== this.id) {
                         entity.vx = vx;
                         entity.vy = vy;
@@ -62,7 +70,7 @@ class ServerAction {
                 }
                 break;
             default:
-                console.error('Unknown action: ' + action);
+                console.error('Unknown action' + action);
                 break;
         }
     }
@@ -72,9 +80,11 @@ class ServerAction {
     sendJoin(x, y, r) {
         this.ws.send(new Uint8Array([0, ...(0, encoding_1.encodeId)(this.id), ...(0, encoding_1.encodePosition)(x, y, r)]));
     }
-    sendMove() {
-        const { vx, vy } = this.game.player;
+    sendMove(vx, vy) {
         this.ws.send(new Uint8Array([2, (0, encoding_1.encodeVelocity)(vx, vy)]));
+    }
+    disconnect() {
+        this.ws.close();
     }
 }
 exports.ServerAction = ServerAction;

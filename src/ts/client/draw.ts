@@ -1,6 +1,6 @@
-import { CANVAS_WIDTH, CANVAS_HEIGHT } from "./game";
-import { createCanvas, sprites, TILE_HEIGHT, TILE_WIDTH } from "./sprites";
-import { sample } from "./utils";
+import { CANVAS_WIDTH, CANVAS_HEIGHT } from './game';
+import { createCanvas, sprites, TILE_HEIGHT, TILE_WIDTH } from './sprites';
+import { sample } from './utils';
 
 export function drawTiles() {
 	const buffer = createCanvas(CANVAS_WIDTH, CANVAS_HEIGHT);

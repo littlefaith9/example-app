@@ -1,9 +1,9 @@
-import { createEntity, isMoving, moveUpdate, randomPosition } from "../common/entityUtils";
-import { EntityBase } from "../common/interfaces";
-import { drawTiles } from "./draw";
-import { requestJoin, ServerAction } from "./socket";
-import { sprites } from "./sprites";
-import { updateInfoText } from "./ui";
+import { createEntity, isMoving, moveUpdate, randomPosition } from '../common/entityUtils';
+import { EntityBase } from '../common/interfaces';
+import { drawTiles } from './draw';
+import { requestJoin, ServerAction } from './socket';
+import { sprites, trotFrames } from './sprites';
+import { updateInfoText } from './ui';
 
 export const CANVAS_WIDTH = 1024;
 export const CANVAS_HEIGHT = 768;
@@ -21,18 +21,16 @@ export class Game {
 	private fps = 0;
 	connection?: ServerAction;
 	player = testEntity;
-	readonly entities: EntityBase[] = [testEntity];
-	serverStat = '';
+	readonly entities: EntityBase[] = [];
+	serverStat = '<no server stat>';
 	constructor (nickname: string, container = document.body) {
 		// create canvas
 		this.canvas = document.createElement('canvas');
 		this.canvas.width = CANVAS_WIDTH;
 		this.canvas.height = CANVAS_HEIGHT;
 
-		requestJoin(this, nickname).then(connection => {
-			this.connection = connection;
-			connection.sendJoin(this.player.x, this.player.y, this.player.right);
-		});
+		this.player.name = nickname;
+		this.reconnect();
 
 		container.appendChild(this.canvas);
 		this.context = this.canvas.getContext('2d')!;
@@ -42,7 +40,7 @@ export class Game {
 			throw new Error('Failed creating context');
 		}
 
-		addEventListener('keydown', ev => this.handleKeydown(ev));
+		addEventListener('keydown', ev => this.handleKeydown(ev), false);
 		addEventListener('keyup', ev => this.handleKeyup(ev));
 		requestAnimationFrame(now => this.update(now));
 	}
@@ -71,37 +69,48 @@ export class Game {
 		this.context.fillText(text, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2);
 		this.context.restore();
 	}
-	private handleKeydown({ key }: KeyboardEvent) {
-		switch (key) {
-			case 'ArrowLeft':
-				this.player.vx = -1;
+	private handleKeydown(ev: KeyboardEvent) {
+		let vx = this.player.vx;
+		let vy = this.player.vy;
+		switch (ev.key) {
+			case 'a': case 'ArrowLeft':
+				vx = -1;
 				break;
-			case 'ArrowRight':
-				this.player.vx = 1;
+			case 'd': case 'ArrowRight':
+				vx = 1;
 				break;
-			case 'ArrowUp':
-				this.player.vy = -1;
+			case 'w': case 'ArrowUp':
+				vy = -1;
 				break;
-			case 'ArrowDown':
-				this.player.vy = 1;
+			case 's': case 'ArrowDown':
+				vy = 1;
 				break;
 		}
-		this.connection?.sendMove();
+		if (vx !== this.player.vx || vy !== this.player.vy) {
+			this.player.vx = vx;
+			this.player.vy = vy;
+			this.connection?.sendMove(vx, vy);
+		}
+		if (ev.key !== 'F12') {
+			ev.preventDefault();
+		}
 	}
 	private handleKeyup({ key }: KeyboardEvent) {
 		switch (key) {
+			case 'a': case 'd':
 			case 'ArrowLeft':
 			case 'ArrowRight':
 				this.player.vx = 0;
 				break;
+			case 'w': case 's':
 			case 'ArrowUp':
 			case 'ArrowDown':
 				this.player.vy = 0;
 				break;
 		}
-		this.connection?.sendMove();
+		this.connection?.sendMove(0, 0);
 	}
-	drawEntity(entity: EntityBase) {
+	private drawEntity(entity: EntityBase) {
 		this.context.save();
 		let right = 1;
 		if (entity.right) {
@@ -117,6 +126,13 @@ export class Game {
 		}
 		this.context.restore();
 	}
+	reconnect() {
+		requestJoin(this, this.player.name).then(connection => {
+			this.connection = connection;
+			this.entities.push(this.player);
+			connection.sendJoin(this.player.x, this.player.y, this.player.right);
+		});
+	}
 	draw() {
 		this.context.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 		this.drawMap();
@@ -124,18 +140,18 @@ export class Game {
 		for (let entity of this.entities) {
 			this.drawEntity(entity);
 		}
+
+		if (!this.connection?.connected) {
+			this.drawBanner('Connecting...');
+		}
 	}
 	update(now: number) {
 		moveUpdate(now, this.entities);
 		if (now - this.lastDraw >= 1000 / MAX_FPS) {
 			this.fps = 1000 / (now - this.lastDraw);
-			this.trotFrame = Math.floor(now / 40) % sprites['faith_trot'].frames.length;
+			this.trotFrame = Math.floor(now / 40) % trotFrames;
 			this.lastDraw = now;
 			this.draw();
-			// only draw when not connected
-			if (!this.connection?.connected) {
-				this.drawBanner('Connecting...');
-			}
 		}
 		if (now - this.lastInfoUpdate >= 2000) {
 			this.lastInfoUpdate = now;

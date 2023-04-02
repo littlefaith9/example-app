@@ -49,7 +49,7 @@ class Client {
     sendMap() {
         const buffer = Buffer.alloc(1 + 5 * server_1.map.clients.length, 0);
         buffer[0] = 4;
-        let last = 0;
+        let last = 1;
         for (let i = 0; i < server_1.map.clients.length; i++) {
             const client = server_1.map.clients[i];
             if (!client)

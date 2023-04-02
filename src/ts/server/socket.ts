@@ -49,7 +49,7 @@ export class Client {
 	sendMap() {
 		const buffer = Buffer.alloc(1 + 5 * map.clients.length, 0);
 		buffer[0] = Action.Map;
-		let last = 0;
+		let last = 1;
 		for (let i = 0; i < map.clients.length; i++) {
 			const client = map.clients[i];
 			if (!client) continue;

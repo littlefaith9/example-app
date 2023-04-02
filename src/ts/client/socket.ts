@@ -1,14 +1,19 @@
-import { decodeId, decodeMovement, decodePosition, encodeId, encodeVelocity, encodePosition } from "../common/encoding";
-import { createFromJoin } from "../common/entityUtils";
-import { Action } from "../common/interfaces";
-import { Game } from "./game";
+import { decodeId, decodeMovement, decodePosition, encodeId, encodeVelocity, encodePosition } from '../common/encoding';
+import { createFromJoin } from '../common/entityUtils';
+import { Action } from '../common/interfaces';
+import { Game } from './game';
 
 export class ServerAction {
 	constructor (private ws: WebSocket, private game: Game, private id: number) {
 		ws.onmessage = ev => this.handleMsg(ev);
+		ws.onclose = () => {
+			game.entities.length = 0;
+			setTimeout(() => game.reconnect(), 3000);
+		}
 		this.game.player.id = id;
 	}
 	async handleMsg({ data }: MessageEvent<Blob>) {
+		if (!data.size) return;
 		const buffer = new Uint8Array(await data.arrayBuffer());
 		const action = buffer[0];
 		switch (action) {
@@ -26,8 +31,8 @@ export class ServerAction {
 				let i = 1;
 				while (i < buffer.length) {
 					const id = decodeId(buffer[i++], buffer[i++]);
+					if (id === this.id) { i += 3; continue; }
 					const { x, y, right } = decodePosition(buffer[i++], buffer[i++], buffer[i++]);
-					if (id === this.id) continue;
 					this.game.entities.push(createFromJoin(id, x, y, right));
 				}
 				break;
@@ -47,17 +52,17 @@ export class ServerAction {
 						console.warn('Cannot find entity ' + id);
 						continue;
 					}
-					entity.x = x;
-					entity.y = y;
+
+					// update position, and velocity if it's other player
 					entity.right = right;
+					entity.x = x; entity.y = y;
 					if (id !== this.id) {
-						entity.vx = vx;
-						entity.vy = vy;
+						entity.vx = vx; entity.vy = vy;
 					}
 				}
 				break;
 			default:
-				console.error('Unknown action: ' + action);
+				console.error('Unknown action' + action);
 				break;
 		}
 
@@ -68,9 +73,11 @@ export class ServerAction {
 	sendJoin(x: number, y: number, r: boolean) {
 		this.ws.send(new Uint8Array([Action.Join, ...encodeId(this.id), ...encodePosition(x, y, r)]));
 	}
-	sendMove() {
-		const { vx, vy } = this.game.player;
+	sendMove(vx: number, vy: number) {
 		this.ws.send(new Uint8Array([Action.Move, encodeVelocity(vx, vy)]));
+	}
+	disconnect() {
+		this.ws.close();
 	}
 }
 
@@ -87,5 +94,5 @@ export async function requestJoin(game: Game, nickname: string) {
 	const serverAction = new ServerAction(socket, game, parseInt(id, 10));
 	return new Promise<ServerAction>(resolve => {
 		socket.onopen = () => resolve(serverAction);
-	})
+	});
 }
