@@ -49,13 +49,15 @@ export class Client {
 	sendMap() {
 		const buffer = Buffer.alloc(1 + 5 * map.clients.length, 0);
 		buffer[0] = Action.Map;
+		let last = 0;
 		for (let i = 0; i < map.clients.length; i++) {
 			const client = map.clients[i];
 			if (!client) continue;
 			buffer.set(encodeId(client.id), 1 + 5 * i);
 			buffer.set(encodePosition(client.entity.x, client.entity.y, client.entity.right), 1 + 5 * i + 2);
+			last += 5;
 		}
-		this.ws.send(buffer);
+		this.ws.send(buffer.subarray(0, last));
 	}
 	sendJoin(id: number, x: number, y: number, r: boolean/*, name: string */) {
 		const [a, b] = encodeId(id);

@@ -49,14 +49,16 @@ class Client {
     sendMap() {
         const buffer = Buffer.alloc(1 + 5 * server_1.map.clients.length, 0);
         buffer[0] = 4;
+        let last = 0;
         for (let i = 0; i < server_1.map.clients.length; i++) {
             const client = server_1.map.clients[i];
             if (!client)
                 continue;
             buffer.set((0, encoding_1.encodeId)(client.id), 1 + 5 * i);
             buffer.set((0, encoding_1.encodePosition)(client.entity.x, client.entity.y, client.entity.right), 1 + 5 * i + 2);
+            last += 5;
         }
-        this.ws.send(buffer);
+        this.ws.send(buffer.subarray(0, last));
     }
     sendJoin(id, x, y, r) {
         const [a, b] = (0, encoding_1.encodeId)(id);
